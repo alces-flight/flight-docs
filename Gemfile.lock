@@ -1,0 +1,24 @@
+GIT
+  remote: https://github.com/openflighthpc/commander-openflighthpc
+  revision: 42cfbbf49ca8c3ab7c348f69b8bc987aae14ad3f
+  specs:
+    commander-openflighthpc (2.1.2)
+      highline (> 1.7.2)
+      paint (~> 2.1.0)
+      slop (~> 4.8)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    highline (2.0.3)
+    paint (2.1.1)
+    slop (4.8.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  commander-openflighthpc!
+
+BUNDLED WITH
+   2.1.4
