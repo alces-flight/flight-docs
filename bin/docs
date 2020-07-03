@@ -1,5 +1,6 @@
+#!/usr/bin/env ruby
 #==============================================================================
-# Copyright (C) 2019-present Alces Flight Ltd.
+# Copyright (C) 2020-present Alces Flight Ltd.
 #
 # This file is part of Flight Docs.
 #
@@ -24,17 +25,26 @@
 # For more information on Flight Docs, please visit:
 # https://github.com/alces-flight/flight-docs
 #==============================================================================
-source 'https://rubygems.org'
-git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
+begin
+  lib_dir = File.join(__FILE__, '../../lib')
+  $LOAD_PATH << lib_dir
+  ENV['BUNDLE_GEMFILE'] ||= File.join(__FILE__, '../../Gemfile')
 
-gem 'commander-openflighthpc', github: 'openflighthpc/commander-openflighthpc'
+  require 'rubygems'
+  gem 'bundler', '2.1.4'
+  require 'bundler'
 
-gem 'http'
-gem 'tty-markdown'
-gem 'tty-pager'
-gem 'tty-table'
-gem 'whirly'
-gem 'xdg'
-# gem 'html2text'
-# gem 'tty-prompt'
-# gem 'word_wrap'
+  Bundler.setup(:default)
+
+  require 'flight_docs'
+  Dir.chdir(ENV.fetch('FLIGHT_CWD','.'))
+  OpenFlight.set_standard_env rescue nil
+  Docs::CLI.run!(*ARGV)
+rescue Interrupt
+  if Kernel.const_defined?(:Paint)
+    $stderr.puts "\n#{Paint['WARNING', :underline, :yellow]}: Cancelled by user"
+  else
+    $stderr.puts "\nWARNING: Cancelled by user"
+  end
+  exit(130)
+end

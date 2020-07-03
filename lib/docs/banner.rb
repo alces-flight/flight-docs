@@ -24,17 +24,23 @@
 # For more information on Flight Docs, please visit:
 # https://github.com/alces-flight/flight-docs
 #==============================================================================
-source 'https://rubygems.org'
-git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
+begin
+  require 'openflight/banner'
+rescue LoadError
+  nil
+end
 
-gem 'commander-openflighthpc', github: 'openflighthpc/commander-openflighthpc'
-
-gem 'http'
-gem 'tty-markdown'
-gem 'tty-pager'
-gem 'tty-table'
-gem 'whirly'
-gem 'xdg'
-# gem 'html2text'
-# gem 'tty-prompt'
-# gem 'word_wrap'
+module Docs
+  module Banner
+    class << self
+      def emit
+        if const_defined?('::OpenFlight')
+          puts OpenFlight::Banner.render(
+            title: Docs::TITLE,
+            version: Docs::VERSION,
+          )
+        end
+      end
+    end
+  end
+end

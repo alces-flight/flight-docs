@@ -1,5 +1,5 @@
 #==============================================================================
-# Copyright (C) 2019-present Alces Flight Ltd.
+# Copyright (C) 2020-present Alces Flight Ltd.
 #
 # This file is part of Flight Docs.
 #
@@ -24,17 +24,19 @@
 # For more information on Flight Docs, please visit:
 # https://github.com/alces-flight/flight-docs
 #==============================================================================
-source 'https://rubygems.org'
-git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
 
-gem 'commander-openflighthpc', github: 'openflighthpc/commander-openflighthpc'
+module Docs
+  class TsvRenderer < TTY::Table::Renderer::Basic
+    def render
+      table.rows
+        .map { |row| render_row(row) }
+        .join("\n")
+    end
 
-gem 'http'
-gem 'tty-markdown'
-gem 'tty-pager'
-gem 'tty-table'
-gem 'whirly'
-gem 'xdg'
-# gem 'html2text'
-# gem 'tty-prompt'
-# gem 'word_wrap'
+    def render_row(row)
+      # XXX Handle line containing "\n" and/or "\t" characters in some way.
+      line = row.fields.map { |field| field.content }.join("\t")
+      TTY::Table::Indentation.indent(line, @indent)
+    end
+  end
+end

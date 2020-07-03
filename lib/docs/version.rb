@@ -1,5 +1,5 @@
 #==============================================================================
-# Copyright (C) 2019-present Alces Flight Ltd.
+# Copyright (C) 2020-present Alces Flight Ltd.
 #
 # This file is part of Flight Docs.
 #
@@ -24,17 +24,7 @@
 # For more information on Flight Docs, please visit:
 # https://github.com/alces-flight/flight-docs
 #==============================================================================
-source 'https://rubygems.org'
-git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
-
-gem 'commander-openflighthpc', github: 'openflighthpc/commander-openflighthpc'
-
-gem 'http'
-gem 'tty-markdown'
-gem 'tty-pager'
-gem 'tty-table'
-gem 'whirly'
-gem 'xdg'
-# gem 'html2text'
-# gem 'tty-prompt'
-# gem 'word_wrap'
+module Docs
+  VERSION = '0.1.0'
+  TITLE = 'Alces Flight Center document viewer'
+end
