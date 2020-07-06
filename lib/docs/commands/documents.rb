@@ -85,7 +85,7 @@ module Docs
 
       def download(args, options)
         id = args.first
-        doc = whirly Paint["Dowloading document #{id}"] do
+        doc = whirly Paint["Downloading document #{id}"] do
           api.get(id.strip)
         end
 

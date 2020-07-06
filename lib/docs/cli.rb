@@ -76,7 +76,7 @@ module Docs
 
     command :download do |c|
       cli_syntax(c, 'DOCUMENT')
-      c.summary = 'Dowload a document.'
+      c.summary = 'Download a document.'
       c.description = 'Download DOCUMENT.'
       c.slop.string '-o', '--output', 'Save DOCUMENT to FILE.  Defaults to a file named DOCUMENT.', meta: 'FILE'
       c.action run_docs_method(:download)
