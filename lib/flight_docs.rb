@@ -24,4 +24,5 @@
 # For more information on Flight Docs, please visit:
 # https://github.com/alces-flight/flight-docs
 #==============================================================================
+require 'docs'
 require 'docs/cli'

@@ -28,7 +28,17 @@ module Docs
   DocsError = Class.new(RuntimeError)
   DocNotFound = Class.new(DocsError) do
     def initialize(doc)
-      super("Unable to find document \"#{doc}\".")
+      super("Unable to find document.")
+    end
+  end
+  DocContentNotFound = Class.new(DocsError) do
+    def initialize(doc)
+      super("Unable to download document.")
+    end
+  end
+  ApiUnavailable = Class.new(DocsError) do
+    def initialize
+      super("Unable to connect to API server.")
     end
   end
 end

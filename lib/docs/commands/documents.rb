@@ -30,11 +30,9 @@ require_relative '../table'
 require_relative '../tsv_renderer'
 
 require 'tty-markdown'
+require_relative '../patches/kramdown'
 require 'tty-pager'
 require 'whirly'
-# require 'html2text'
-# require 'tty-prompt'
-# require 'word_wrap'
 
 module Docs
   module Commands
@@ -48,7 +46,7 @@ module Docs
         table = Table.build do |t|
           headers 'ID', 'Title', 'Type'
           documents.each do |doc|
-            row doc['id'], doc['title'], doc['content_type']
+            row doc.id, doc.filename, doc.content_type
           end
         end
 
@@ -64,16 +62,16 @@ module Docs
       end
 
       def show(args, options)
-        id = args.first
+        id = args.first.strip
         doc = whirly Paint["Retrieving document #{id}"] do
-          api.get(id.strip)
+          api.get(id)
         end
 
         content =
-          if $stdout.tty? && !options[:no_pretty] && doc['content_type'] == 'text/markdown'
-            TTY::Markdown.parse(doc['content'])
+          if $stdout.tty? && !options[:no_pretty] && doc.content_type == 'text/markdown'
+            TTY::Markdown.parse(doc.content)
           else
-            doc['content']
+            doc.content
           end
 
         if options[:no_pager]
@@ -84,13 +82,13 @@ module Docs
       end
 
       def download(args, options)
-        id = args.first
+        id = args.first.strip
         doc = whirly Paint["Downloading document #{id}"] do
-          api.get(id.strip)
+          api.get(id)
         end
 
-        file = options[:output] || doc['title']
-        File.write(file, doc['content'])
+        file = options[:output] || doc.filename
+        File.write(file, doc.content)
       end
 
       private
@@ -113,7 +111,7 @@ module Docs
       end
 
       def api
-        @api ||= Docs::FakeAPI.new
+        @api ||= Docs::API.new
       end
     end
   end

@@ -1,5 +1,5 @@
 #==============================================================================
-# Copyright (C) 2019-present Alces Flight Ltd.
+# Copyright (C) 2020-present Alces Flight Ltd.
 #
 # This file is part of Flight Docs.
 #
@@ -25,45 +25,19 @@
 # https://github.com/alces-flight/flight-account
 #==============================================================================
 
-require_relative 'records'
-require_relative 'errors'
-
 module Docs
-  class API
-    def list
-      Document.all
-    rescue JsonApiClient::Errors::ConnectionError
-      raise ApiUnavailable
-    end
+  def self.configure_faraday(faraday)
+    faraday.authorization :Bearer, AccountConfig.new.auth_token
+    faraday.headers[:user_agent] = "Flight-Docs/#{Docs::VERSION}"
+  end
 
-    def get(id)
-      begin
-        doc = Document.find(id).first
-      rescue JsonApiClient::Errors::NotFound
-        raise DocNotFound, id
-      else
-        begin
-          response = http.get(doc.links.download)
-        rescue Faraday::ResourceNotFound
-          raise DocContentNotFound, id
-        else
-          doc.content = response.body
-        end
-        doc
-      end
-    rescue JsonApiClient::Errors::ConnectionError, Faraday::ConnectionFailed
-      raise ApiUnavailable
-    end
-
-    private
-
-    def http
-      @http ||= Faraday.new do |faraday|
-        Docs.configure_faraday(faraday)
-        Docs.use_faraday_logger(faraday)
-        faraday.use FaradayMiddleware::FollowRedirects
-        faraday.use Faraday::Response::RaiseError
-        faraday.adapter Faraday.default_adapter
+  def self.use_faraday_logger(faraday_or_connection)
+    if ENV.fetch('DEBUG', false)
+      faraday_or_connection.use(Faraday::Response::Logger, nil, {
+        headers: false,
+        bodies: false,
+      }) do |l|
+        l.filter(/(Authorization:)(.*)/, '\1 [REDACTED]')
       end
     end
   end

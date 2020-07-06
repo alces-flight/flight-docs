@@ -1,5 +1,5 @@
 #==============================================================================
-# Copyright (C) 2019-present Alces Flight Ltd.
+# Copyright (C) 2020-present Alces Flight Ltd.
 #
 # This file is part of Flight Docs.
 #
@@ -25,46 +25,35 @@
 # https://github.com/alces-flight/flight-account
 #==============================================================================
 
-require_relative 'records'
-require_relative 'errors'
+require_relative 'config'
+require_relative 'version'
+
+require 'json_api_client'
 
 module Docs
-  class API
-    def list
-      Document.all
-    rescue JsonApiClient::Errors::ConnectionError
-      raise ApiUnavailable
+  class BaseRecord < JsonApiClient::Resource
+    self.site = DocsConfig.new.base_url
+  end
+
+  BaseRecord.connection do |connection|
+    Docs.configure_faraday(connection.faraday)
+    Docs.use_faraday_logger(connection)
+    connection.faraday.ssl.verify = DocsConfig.new.verify_ssl?
+  end
+
+  class Document < BaseRecord
+    attr_accessor :content
+
+    def content
+      @content.to_s
     end
 
-    def get(id)
-      begin
-        doc = Document.find(id).first
-      rescue JsonApiClient::Errors::NotFound
-        raise DocNotFound, id
-      else
-        begin
-          response = http.get(doc.links.download)
-        rescue Faraday::ResourceNotFound
-          raise DocContentNotFound, id
-        else
-          doc.content = response.body
-        end
-        doc
-      end
-    rescue JsonApiClient::Errors::ConnectionError, Faraday::ConnectionFailed
-      raise ApiUnavailable
-    end
-
-    private
-
-    def http
-      @http ||= Faraday.new do |faraday|
-        Docs.configure_faraday(faraday)
-        Docs.use_faraday_logger(faraday)
-        faraday.use FaradayMiddleware::FollowRedirects
-        faraday.use Faraday::Response::RaiseError
-        faraday.adapter Faraday.default_adapter
-      end
+    def content_type
+      self['content-type']
     end
   end
+
+  class Case < BaseRecord; end
+  class Component < BaseRecord; end
+  class Site < BaseRecord; end
 end

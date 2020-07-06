@@ -29,12 +29,9 @@ git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
 
 gem 'commander-openflighthpc', github: 'openflighthpc/commander-openflighthpc'
 
-gem 'http'
+gem 'json_api_client'
 gem 'tty-markdown'
 gem 'tty-pager'
 gem 'tty-table'
 gem 'whirly'
 gem 'xdg'
-# gem 'html2text'
-# gem 'tty-prompt'
-# gem 'word_wrap'
