@@ -43,10 +43,11 @@ module Docs
           api.list
         end
 
+        pretty_content_type = self.method(:pretty_content_type)
         table = Table.build do |t|
           headers 'ID', 'Title', 'Type'
           documents.each do |doc|
-            row doc.id, doc.filename, doc.content_type
+            row doc.id, doc.filename, pretty_content_type.(doc.content_type)
           end
         end
 
@@ -111,6 +112,38 @@ module Docs
 
       def api
         @api ||= Docs::API.new
+      end
+
+      def pretty_content_type(content_type)
+        case content_type
+        when "image/png", "image/jpg", "image/jpeg"
+          "Image"
+        when "application/pdf"
+          "PDF"
+        when 'application/zip',
+          'application/x-bzip2',
+          'application/x-bzip',
+          'application/x-gzip'
+          'Archive'
+        when 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          'application/vnd.oasis.opendocument.spreadsheet',
+          'application/vnd.ms-excel'
+          'Spreadsheet'
+        when 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          'application/vnd.oasis.opendocument.text',
+          'application/msword'
+          'Word document'
+        when 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+          'application/vnd.oasis.opendocument.presentation',
+          'application/vnd.ms-powerpoint'
+          'Presentation'
+        when 'text/markdown'
+          'Markdown'
+        when 'text/plain', /^text\//
+          'Text'
+        else
+          "Unknown"
+        end
       end
     end
   end
