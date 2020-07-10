@@ -67,17 +67,15 @@ module Docs
           api.get(id)
         end
 
-        content =
-          if $stdout.tty? && !options[:no_pretty] && doc.content_type == 'text/markdown'
-            TTY::Markdown.parse(doc.content)
+        if printable?(doc)
+          content = pretty_content(doc, pretty: !options[:no_pretty])
+          if options[:no_pager]
+            puts content
           else
-            doc.content
+            TTY::Pager.new.page(content)
           end
-
-        if options[:no_pager]
-          puts content
         else
-          TTY::Pager.new.page(content)
+          save(doc, output: options[:output])
         end
       end
 
@@ -86,12 +84,16 @@ module Docs
         doc = whirly Paint["Downloading document #{id}"] do
           api.get(id)
         end
-
-        file = options[:output] || doc.filename
-        File.write(file, doc.content)
+        save(doc, output: options[:output])
       end
 
       private
+
+      def save(doc, output:)
+        filename = output || doc.filename
+        puts("Saving binary file to #{filename.inspect}")
+        File.write(filename, doc.content)
+      end
 
       def whirly(status, &block)
         if $stdout.tty?
@@ -112,6 +114,24 @@ module Docs
 
       def api
         @api ||= Docs::API.new
+      end
+
+      def printable?(doc)
+        return true if !$stdout.tty?
+        case doc.content_type
+        when /^text\//
+          true
+        else
+          false
+        end
+      end
+
+      def pretty_content(doc, pretty:)
+        if $stdout.tty? && pretty && doc.content_type == 'text/markdown'
+          TTY::Markdown.parse(doc.content) rescue doc.content
+        else
+          doc.content
+        end
       end
 
       def pretty_content_type(content_type)
