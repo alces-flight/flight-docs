@@ -27,13 +27,18 @@
 module Docs
   DocsError = Class.new(RuntimeError)
   DocNotFound = Class.new(DocsError) do
-    def initialize(doc)
+    def initialize(id)
       super("Unable to find document.")
     end
   end
   DocContentNotFound = Class.new(DocsError) do
-    def initialize(doc)
+    def initialize(id)
       super("Unable to download document.")
+    end
+  end
+  MultipleDocsFound = Class.new(DocsError) do
+    def initialize(id, docs)
+      super("Multiple documents match the given name")
     end
   end
   ApiUnavailable = Class.new(DocsError) do

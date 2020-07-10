@@ -61,8 +61,7 @@ module Docs
         end
       end
 
-      def show(args, options)
-        id = args.first.strip
+      def show(id, options)
         doc = whirly Paint["Retrieving document #{id}"] do
           api.get(id)
         end

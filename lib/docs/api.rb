@@ -38,7 +38,7 @@ module Docs
 
     def get(id)
       begin
-        doc = Document.find(id).first
+        doc = parse(id).is_a?(Integer) ? get_by_id(id) : get_by_filename(id)
       rescue JsonApiClient::Errors::NotFound
         raise DocNotFound, id
       else
@@ -56,6 +56,29 @@ module Docs
     end
 
     private
+
+    def get_by_id(id)
+      Document.find(id).first
+    end
+
+    def get_by_filename(filename)
+      docs = Document.where(filename: filename).all
+      if docs.empty?
+        raise DocNotFound, filename
+      elsif docs.length > 1
+        raise MultipleDocsFound.new(filename, docs)
+      else
+        docs.first
+      end
+    end
+
+    def parse(id)
+      begin
+        Integer(id)
+      rescue ArgumentError
+        id
+      end
+    end
 
     def http
       @http ||= Faraday.new do |faraday|

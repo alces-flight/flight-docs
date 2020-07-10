@@ -71,7 +71,13 @@ module Docs
       c.description = 'Display DOCUMENT in your terminal.'
       c.slop.bool '--no-pager', 'View the document in a pager', default: false
       c.slop.bool '--no-pretty', 'Display a pretty rendering of the document', default: false
-      c.action run_docs_method(:show)
+      c.action do |args, opts, config|
+        id = args.first.strip
+        if id.empty?
+          raise Commander::Command::CommandUsageError, "DOCUMENT cannot be blank"
+        end
+        Docs::Commands::Documents.new.show(id, opts)
+      end
     end
 
     command :download do |c|
