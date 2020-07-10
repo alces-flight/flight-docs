@@ -31,7 +31,7 @@ require_relative 'errors'
 module Docs
   class API
     def list
-      Document.all
+      Document.includes(:containers, :record).all
     rescue JsonApiClient::Errors::ConnectionError
       raise ApiUnavailable
     end

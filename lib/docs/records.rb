@@ -48,12 +48,32 @@ module Docs
       @content.to_s
     end
 
+    def location
+      if containers.empty?
+        record.name
+      else
+        containers
+          .map { |c| c.respond_to?(:display_id) ? c.display_id : c.name }
+          .join(" / ")
+      end
+    end
+
     def content_type
       self['content-type']
     end
   end
 
-  class Case < BaseRecord; end
+  class Case < BaseRecord
+    def display_id
+      self['display-id']
+    end
+  end
   class Component < BaseRecord; end
   class Site < BaseRecord; end
+
+  class Global < BaseRecord
+    def name
+      'Global'
+    end
+  end
 end

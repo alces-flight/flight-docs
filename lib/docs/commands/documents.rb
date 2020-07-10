@@ -45,9 +45,9 @@ module Docs
 
         pretty_content_type = self.method(:pretty_content_type)
         table = Table.build do |t|
-          headers 'ID', 'Title', 'Type'
+          headers 'ID', 'Location', 'Title', 'Type'
           documents.each do |doc|
-            row doc.id, doc.filename, pretty_content_type.(doc.content_type)
+            row doc.id, doc.location, doc.filename, pretty_content_type.(doc.content_type)
           end
         end
 
