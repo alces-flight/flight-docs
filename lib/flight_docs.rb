@@ -25,4 +25,3 @@
 # https://github.com/alces-flight/flight-docs
 #==============================================================================
 require 'docs'
-require 'docs/cli'

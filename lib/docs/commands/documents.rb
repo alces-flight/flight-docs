@@ -24,11 +24,6 @@
 # For more information on Flight Docs, please visit:
 # https://github.com/alces-flight/flight-docs
 #==============================================================================
-require_relative '../api'
-require_relative '../banner'
-require_relative '../table'
-require_relative '../tsv_renderer'
-
 require 'tty-markdown'
 require_relative '../patches/kramdown'
 require 'tty-pager'

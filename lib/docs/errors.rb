@@ -25,25 +25,27 @@
 # https://github.com/alces-flight/flight-docs
 #==============================================================================
 module Docs
-  DocsError = Class.new(RuntimeError)
-  DocNotFound = Class.new(DocsError) do
-    def initialize(id)
-      super("Unable to find document.")
+  module Errors
+    DocsError = Class.new(RuntimeError)
+    DocNotFound = Class.new(DocsError) do
+      def initialize(id)
+        super("Unable to find document.")
+      end
     end
-  end
-  DocContentNotFound = Class.new(DocsError) do
-    def initialize(id)
-      super("Unable to download document.")
+    DocContentNotFound = Class.new(DocsError) do
+      def initialize(id)
+        super("Unable to download document.")
+      end
     end
-  end
-  MultipleDocsFound = Class.new(DocsError) do
-    def initialize(id, docs)
-      super("Multiple documents match the given name")
+    MultipleDocsFound = Class.new(DocsError) do
+      def initialize(id, docs)
+        super("Multiple documents match the given name")
+      end
     end
-  end
-  ApiUnavailable = Class.new(DocsError) do
-    def initialize
-      super("Unable to connect to API server.")
+    ApiUnavailable = Class.new(DocsError) do
+      def initialize
+        super("Unable to connect to API server.")
+      end
     end
   end
 end

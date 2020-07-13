@@ -25,55 +25,54 @@
 # https://github.com/alces-flight/flight-account
 #==============================================================================
 
-require_relative 'config'
-require_relative 'version'
-
 require 'json_api_client'
 
 module Docs
-  class BaseRecord < JsonApiClient::Resource
-    self.site = DocsConfig.new.base_url
-  end
-
-  BaseRecord.connection do |connection|
-    Docs.configure_faraday(connection.faraday)
-    Docs.use_faraday_logger(connection)
-    connection.faraday.ssl.verify = DocsConfig.new.verify_ssl?
-  end
-
-  class Document < BaseRecord
-    attr_accessor :content
-
-    def content
-      @content.to_s
+  module Records
+    class BaseRecord < JsonApiClient::Resource
+      self.site = Config::DocsConfig.new.base_url
     end
 
-    def location
-      if containers.empty?
-        record.name
-      else
-        containers
-          .map { |c| c.respond_to?(:display_id) ? c.display_id : c.name }
-          .join(" / ")
+    BaseRecord.connection do |connection|
+      Docs.configure_faraday(connection.faraday)
+      Docs.use_faraday_logger(connection)
+      connection.faraday.ssl.verify = Config::DocsConfig.new.verify_ssl?
+    end
+
+    class Document < BaseRecord
+      attr_accessor :content
+
+      def content
+        @content.to_s
+      end
+
+      def location
+        if containers.empty?
+          record.name
+        else
+          containers
+            .map { |c| c.respond_to?(:display_id) ? c.display_id : c.name }
+            .join(" / ")
+        end
+      end
+
+      def content_type
+        self['content-type']
       end
     end
 
-    def content_type
-      self['content-type']
+    class Case < BaseRecord
+      def display_id
+        self['display-id']
+      end
     end
-  end
+    class Component < BaseRecord; end
+    class Site < BaseRecord; end
 
-  class Case < BaseRecord
-    def display_id
-      self['display-id']
-    end
-  end
-  class Component < BaseRecord; end
-  class Site < BaseRecord; end
-
-  class Global < BaseRecord
-    def name
-      'Global'
+    class Global < BaseRecord
+      def name
+        'Global'
+      end
     end
   end
 end

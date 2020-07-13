@@ -24,10 +24,24 @@
 # For more information on Flight Docs, please visit:
 # https://github.com/alces-flight/flight-account
 #==============================================================================
+require_relative 'docs/version'
 
 module Docs
+  autoload(:API, 'docs/api')
+  autoload(:Banner, 'docs/banner')
+  autoload(:CLI, 'docs/cli')
+  autoload(:Config, 'docs/config')
+  autoload(:Errors, 'docs/errors')
+  autoload(:Records, 'docs/records')
+  autoload(:Table, 'docs/table')
+  autoload(:TsvRenderer, 'docs/tsv_renderer')
+
+  module Commands
+    autoload(:Documents, 'docs/commands/documents')
+  end
+
   def self.configure_faraday(faraday)
-    faraday.authorization :Bearer, AccountConfig.new.auth_token
+    faraday.authorization :Bearer, Config::AccountConfig.new.auth_token
     faraday.headers[:user_agent] = "Flight-Docs/#{Docs::VERSION}"
   end
 

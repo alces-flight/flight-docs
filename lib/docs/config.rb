@@ -30,76 +30,78 @@ require 'fileutils'
 require 'etc'
 
 module Docs
-  class ConfigBase
-    private
+  module Config
+    class Base
+      private
 
-    def data
-      @data ||= load
-    end
+      def data
+        @data ||= load
+      end
 
-    def load
-      if File.exists?(config_file)
-        YAML.load_file(config_file)
-      else
-        {}
+      def load
+        if File.exists?(config_file)
+          YAML.load_file(config_file)
+        else
+          {}
+        end
+      end
+
+      def config_file
+        File.join(config_dir, 'config.yml')
+      end
+
+      def config_dir
+        @xdg ||= XDG::Environment.new
+        File.join(@xdg.config_home, subdirectory)
       end
     end
 
-    def config_file
-      File.join(config_dir, 'config.yml')
-    end
-
-    def config_dir
-      @xdg ||= XDG::Environment.new
-      File.join(@xdg.config_home, subdirectory)
-    end
-  end
-
-  class DocsConfig < ConfigBase
-    def base_url
-      ENV['flight_CENTER_URL'] ||
-        data[:base_url] ||
-        'http://center.alces-flight.lvh.me:3003/api/v2'
-      # 'https://staging.documents.alces-flight.com/api/v2'
-      # 'https://center.alces-flight.com/api/v2'
-    end
-
-    def verify_ssl?
-      !!data[:verify_ssl]
-    end
-
-    def set(key, value)
-      if value
-        data[key.to_sym] = value
-      else
-        data.delete(key.to_sym)
+    class DocsConfig < Base
+      def base_url
+        ENV['flight_CENTER_URL'] ||
+          data[:base_url] ||
+          'http://center.alces-flight.lvh.me:3003/api/v2'
+        # 'https://staging.documents.alces-flight.com/api/v2'
+        # 'https://center.alces-flight.com/api/v2'
       end
-      save
-    end
 
-    def save
-      unless Dir.exists?(config_dir)
-        FileUtils.mkdir_p(config_dir, mode: 0700)
+      def verify_ssl?
+        !!data[:verify_ssl]
       end
-      File.write(config_file, data.to_yaml)
+
+      def set(key, value)
+        if value
+          data[key.to_sym] = value
+        else
+          data.delete(key.to_sym)
+        end
+        save
+      end
+
+      def save
+        unless Dir.exists?(config_dir)
+          FileUtils.mkdir_p(config_dir, mode: 0700)
+        end
+        File.write(config_file, data.to_yaml)
+      end
+
+      private
+
+      def subdirectory
+        File.join('flight', 'docs')
+      end
     end
 
-    private
+    class AccountConfig < Base
+      def auth_token
+        data[:auth_token]
+      end
 
-    def subdirectory
-      File.join('flight', 'docs')
-    end
-  end
+      private
 
-  class AccountConfig < ConfigBase
-    def auth_token
-      data[:auth_token]
-    end
-
-    private
-
-    def subdirectory
-      File.join('flight', 'account')
+      def subdirectory
+        File.join('flight', 'account')
+      end
     end
   end
 end

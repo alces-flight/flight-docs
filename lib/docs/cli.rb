@@ -24,9 +24,6 @@
 # For more information on Flight Docs, please visit:
 # https://github.com/alces-flight/flight-docs
 #==============================================================================
-require_relative 'commands/documents'
-require_relative 'version'
-
 require 'commander'
 
 module Docs

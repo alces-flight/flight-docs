@@ -25,48 +25,47 @@
 # https://github.com/alces-flight/flight-account
 #==============================================================================
 
-require_relative 'records'
-require_relative 'errors'
+require 'json_api_client'
 
 module Docs
   class API
     def list
-      Document.includes(:containers, :record).all
+      Records::Document.includes(:containers, :record).all
     rescue JsonApiClient::Errors::ConnectionError
-      raise ApiUnavailable
+      raise Errors::ApiUnavailable
     end
 
     def get(id)
       begin
         doc = parse(id).is_a?(Integer) ? get_by_id(id) : get_by_filename(id)
       rescue JsonApiClient::Errors::NotFound
-        raise DocNotFound, id
+        raise Errors::DocNotFound, id
       else
         begin
           response = http.get(doc.links.download)
         rescue Faraday::ResourceNotFound
-          raise DocContentNotFound, id
+          raise Errors::DocContentNotFound, id
         else
           doc.content = response.body
         end
         doc
       end
     rescue JsonApiClient::Errors::ConnectionError, Faraday::ConnectionFailed
-      raise ApiUnavailable
+      raise Errors::ApiUnavailable
     end
 
     private
 
     def get_by_id(id)
-      Document.find(id).first
+      Records::Document.find(id).first
     end
 
     def get_by_filename(filename)
-      docs = Document.where(filename: filename).all
+      docs = Records::Document.where(filename: filename).all
       if docs.empty?
-        raise DocNotFound, filename
+        raise Errors::DocNotFound, filename
       elsif docs.length > 1
-        raise MultipleDocsFound.new(filename, docs)
+        raise Errors::MultipleDocsFound.new(filename, docs)
       else
         docs.first
       end
