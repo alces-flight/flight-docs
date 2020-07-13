@@ -61,13 +61,13 @@ module Docs
       end
 
       def content_type
-        self['content-type']
+        self['content-type'] || self['content_type']
       end
     end
 
     class Case < BaseRecord
       def display_id
-        self['display-id']
+        self['display-id'] || self['display_id']
       end
     end
     class Component < BaseRecord; end
