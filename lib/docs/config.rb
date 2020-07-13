@@ -60,9 +60,9 @@ module Docs
       def base_url
         ENV['flight_CENTER_URL'] ||
           data[:base_url] ||
-          'http://center.alces-flight.lvh.me:3003/api/v2'
-        # 'https://staging.documents.alces-flight.com/api/v2'
-        # 'https://center.alces-flight.com/api/v2'
+          # 'http://center.alces-flight.lvh.me:3003/api/v2'
+          # 'https://staging.center.alces-flight.com/api/v2'
+          'https://center.alces-flight.com/api/v2'
       end
 
       def verify_ssl?
