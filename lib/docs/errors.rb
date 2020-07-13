@@ -47,5 +47,15 @@ module Docs
         super("Unable to connect to API server.")
       end
     end
+    NotSignedIn = Class.new(DocsError) do
+      def message
+        <<~EOF
+          #{Paint['You are not logged into your Alces Flight Account.', :red]}
+          You can login to your account by running:
+
+              flight account login
+        EOF
+      end
+    end
   end
 end

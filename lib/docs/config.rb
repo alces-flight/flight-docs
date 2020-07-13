@@ -97,6 +97,10 @@ module Docs
         data[:auth_token]
       end
 
+      def signed_in?
+        !(auth_token.nil? || auth_token.empty?)
+      end
+
       private
 
       def subdirectory

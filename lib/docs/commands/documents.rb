@@ -32,8 +32,11 @@ require 'whirly'
 module Docs
   module Commands
     class Documents
+
       def list(args, options)
         Docs::Banner.emit
+        asset_signed_in
+
         documents = whirly Paint['Retrieving documents'] do
           api.list
         end
@@ -58,6 +61,8 @@ module Docs
       end
 
       def show(id, options)
+        asset_signed_in
+
         doc = whirly Paint["Retrieving document #{id}"] do
           api.get(id)
         end
@@ -75,6 +80,8 @@ module Docs
       end
 
       def download(args, options)
+        asset_signed_in
+
         id = args.first.strip
         doc = whirly Paint["Downloading document #{id}"] do
           api.get(id)
@@ -83,6 +90,10 @@ module Docs
       end
 
       private
+
+      def asset_signed_in
+        raise Errors::NotSignedIn unless Config::AccountConfig.new.signed_in?
+      end
 
       def save(doc, output:)
         filename = output || doc.filename
