@@ -50,9 +50,13 @@ module Docs
         if containers.empty?
           record.name
         else
-          containers
+          names = containers
             .map { |c| c.respond_to?(:display_id) ? c.display_id : c.name }
-            .join(" / ")
+          if names.length > 1
+            names[1..-1].join(" / ")
+          else
+            names[0]
+          end
         end
       end
 
