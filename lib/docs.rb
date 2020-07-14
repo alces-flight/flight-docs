@@ -28,7 +28,6 @@ require_relative 'docs/version'
 
 module Docs
   autoload(:API, 'docs/api')
-  autoload(:Banner, 'docs/banner')
   autoload(:CLI, 'docs/cli')
   autoload(:Config, 'docs/config')
   autoload(:Errors, 'docs/errors')

@@ -34,7 +34,6 @@ module Docs
     class Documents
 
       def list(args, options)
-        Docs::Banner.emit
         asset_signed_in
 
         documents = whirly Paint['Retrieving documents'] do

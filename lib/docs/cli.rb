@@ -34,7 +34,7 @@ module Docs
 
     program :application, Docs::TITLE
     program :name, PROGRAM_NAME
-    program :version, Docs::VERSION
+    program :version, "v#{Docs::VERSION}"
     program :description, 'Alces Flight Center document viewer.'
     program :help_paging, false
     default_command :help
