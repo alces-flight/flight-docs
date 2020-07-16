@@ -35,64 +35,20 @@ module Docs
 
       def list(args, options)
         assert_signed_in
-
         documents = whirly Paint['Retrieving documents', :cyan] do
           api.list
         end
-
-        pretty_content_type = self.method(:pretty_content_type)
-        word_wrap = method(:word_wrap)
-        location_cols, filename_cols = truncate_lengths(documents)
-
-        table = Table.build do |t|
-          headers 'Filename', 'Location', 'Type'
-          documents.each do |doc|
-            if $stdout.tty?
-              # NOTE: If changing this also change `truncate_lengths`.
-              row(
-                Paint[word_wrap.call(doc.filename, line_width: filename_cols), :cyan],
-                Paint[word_wrap.call(doc.location, line_width: location_cols), :yellow],
-                pretty_content_type.(doc.content_type)
-              )
-            else
-              row(
-                doc.filename,
-                doc.location,
-                pretty_content_type.(doc.content_type),
-                doc.id,
-              )
-            end
-          end
-        end
-
-        if $stdout.tty?
-          if documents.empty?
-            puts Paint["No documents found.", :red]
-          else
-            table.emit
-          end
-        else
-          table.emit(renderer: Docs::TsvRenderer)
-        end
+        display_table(documents)
       end
 
       def show(id, options)
         assert_signed_in
-
         doc = whirly Paint["Retrieving document #{id}", :cyan] do
           api.get(id)
         end
-
-        if printable?(doc)
-          content = pretty_content(doc, pretty: !options[:no_pretty])
-          if options[:no_pager]
-            puts content
-          else
-            TTY::Pager.new.page(content)
-          end
-        else
-          save(doc, output: options[:output])
-        end
+        display_content(doc, options)
+      rescue Errors::MultipleDocsFound => e
+        display_table(e.docs)
       end
 
       def download(args, options)
@@ -256,6 +212,56 @@ module Docs
             line
           end
         end * break_sequence
+      end
+
+      def display_table(documents)
+        pretty_content_type = self.method(:pretty_content_type)
+        word_wrap = method(:word_wrap)
+        location_cols, filename_cols = truncate_lengths(documents)
+
+        table = Table.build do |t|
+          headers 'Filename', 'Location', 'Type'
+          documents.each do |doc|
+            if $stdout.tty?
+              # NOTE: If changing this also change `truncate_lengths`.
+              row(
+                Paint[word_wrap.call(doc.filename, line_width: filename_cols), :cyan],
+                Paint[word_wrap.call(doc.location, line_width: location_cols), :yellow],
+                pretty_content_type.(doc.content_type)
+              )
+            else
+              row(
+                doc.filename,
+                doc.location,
+                pretty_content_type.(doc.content_type),
+                doc.id,
+              )
+            end
+          end
+        end
+
+        if $stdout.tty?
+          if documents.empty?
+            puts Paint["No documents found.", :red]
+          else
+            table.emit
+          end
+        else
+          table.emit(renderer: Docs::TsvRenderer)
+        end
+      end
+
+      def display_content(doc, options)
+        if printable?(doc)
+          content = pretty_content(doc, pretty: !options[:no_pretty])
+          if options[:no_pager]
+            puts content
+          else
+            TTY::Pager.new.page(content)
+          end
+        else
+          save(doc, output: options[:output])
+        end
       end
     end
   end

@@ -38,7 +38,9 @@ module Docs
       end
     end
     MultipleDocsFound = Class.new(DocsError) do
+      attr_reader :docs
       def initialize(id, docs)
+        @docs = docs
         super("Multiple documents match the given name")
       end
     end

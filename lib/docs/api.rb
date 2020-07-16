@@ -30,8 +30,12 @@ require 'json_api_client'
 module Docs
   class API
     def list
-      Records::Document
+      query = Records::Document
         .includes(:containers, :record)
+      if block_given?
+        query = yield query
+      end
+      query
         .all
         .sort_by { |d| d.filename.downcase }
     rescue JsonApiClient::Errors::ConnectionError
@@ -65,7 +69,9 @@ module Docs
     # end
 
     def get_by_filename(filename)
-      docs = Records::Document.where(filename: filename).all
+      docs = list do |query|
+        query.where(filename: filename)
+      end
       if docs.empty?
         raise Errors::DocNotFound, filename
       elsif docs.length > 1
