@@ -25,6 +25,6 @@
 # https://github.com/alces-flight/flight-docs
 #==============================================================================
 module Docs
-  VERSION = '0.1.3'
+  VERSION = '0.1.4'
   TITLE = 'Alces Flight Center document viewer'
 end
