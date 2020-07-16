@@ -34,7 +34,7 @@ module Docs
     class Documents
 
       def list(args, options)
-        asset_signed_in
+        assert_signed_in
 
         documents = whirly Paint['Retrieving documents', :cyan] do
           api.list
@@ -77,7 +77,7 @@ module Docs
       end
 
       def show(id, options)
-        asset_signed_in
+        assert_signed_in
 
         doc = whirly Paint["Retrieving document #{id}", :cyan] do
           api.get(id)
@@ -96,7 +96,7 @@ module Docs
       end
 
       def download(args, options)
-        asset_signed_in
+        assert_signed_in
 
         id = args.first.strip
         doc = whirly Paint["Downloading document #{id}", :cyan] do
@@ -107,7 +107,7 @@ module Docs
 
       private
 
-      def asset_signed_in
+      def assert_signed_in
         raise Errors::NotSignedIn unless Config::AccountConfig.new.signed_in?
       end
 
