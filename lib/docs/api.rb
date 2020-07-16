@@ -39,7 +39,7 @@ module Docs
       begin
         # doc = parse(id).is_a?(Integer) ? get_by_id(id) : get_by_filename(id)
         doc = get_by_filename(id)
-      rescue JsonApiClient::Errors::NotFound
+      rescue JsonApiClient::Errors::NotFound, JsonApiClient::Errors::AccessDenied
         raise Errors::DocNotFound, id
       else
         begin
