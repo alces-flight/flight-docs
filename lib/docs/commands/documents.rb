@@ -183,7 +183,9 @@ module Docs
           'Presentation'
         when 'text/markdown'
           'Markdown'
-        when 'text/plain', /^text\//
+        when 'application/x-shellscript'
+          'Shellscript'
+        when 'text/plain', /^text\//, 'application/json'
           'Text'
         else
           "Unknown"
