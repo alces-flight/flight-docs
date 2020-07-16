@@ -213,7 +213,7 @@ module Docs
 
         if max_location_length + max_filename_length <= available_cols
           # No truncation necessary.
-          [ max_location_length, max_location_length ]
+          [ max_location_length, max_filename_length ]
         else
           # Let's give 30% to location unless it needs less.
           location_cols = [available_cols * 0.3, max_location_length].min.to_i
