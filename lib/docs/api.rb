@@ -30,7 +30,10 @@ require 'json_api_client'
 module Docs
   class API
     def list
-      Records::Document.includes(:containers, :record).all
+      Records::Document
+        .includes(:containers, :record)
+        .all
+        .sort_by { |d| d.filename.downcase }
     rescue JsonApiClient::Errors::ConnectionError
       raise Errors::ApiUnavailable
     end
