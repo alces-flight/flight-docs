@@ -197,6 +197,7 @@ module Docs
       #
       # The current algorithm can result in unnecessarily truncated locations.
       def truncate_lengths(documents)
+        return [nil, nil] if documents.empty?
         max_location_length = documents.map { |d| d.location.length }.max
         max_filename_length = documents.map { |d| d.filename.length }.max
 
