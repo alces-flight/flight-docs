@@ -36,7 +36,7 @@ module Docs
       def list(args, options)
         asset_signed_in
 
-        documents = whirly Paint['Retrieving documents'] do
+        documents = whirly Paint['Retrieving documents', :cyan] do
           api.list
         end
 
@@ -50,9 +50,9 @@ module Docs
             if $stdout.tty?
               # NOTE: If changing this also change `truncate_lengths`.
               row(
-                doc.id,
-                word_wrap.call(doc.location, line_width: location_cols),
-                word_wrap.call(doc.filename, line_width: title_cols),
+                Paint[doc.id, :green],
+                Paint[word_wrap.call(doc.location, line_width: location_cols), :yellow],
+                Paint[word_wrap.call(doc.filename, line_width: title_cols), :cyan],
                 pretty_content_type.(doc.content_type)
               )
             else
@@ -68,7 +68,7 @@ module Docs
 
         if $stdout.tty?
           if documents.empty?
-            puts "No documents found."
+            puts Paint["No documents found.", :red]
           else
             table.emit
           end
@@ -80,7 +80,7 @@ module Docs
       def show(id, options)
         asset_signed_in
 
-        doc = whirly Paint["Retrieving document #{id}"] do
+        doc = whirly Paint["Retrieving document #{id}", :cyan] do
           api.get(id)
         end
 
@@ -100,7 +100,7 @@ module Docs
         asset_signed_in
 
         id = args.first.strip
-        doc = whirly Paint["Downloading document #{id}"] do
+        doc = whirly Paint["Downloading document #{id}", :cyan] do
           api.get(id)
         end
         save(doc, output: options[:output])
