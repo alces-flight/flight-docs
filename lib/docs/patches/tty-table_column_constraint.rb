@@ -24,66 +24,36 @@
 # For more information on Flight Docs, please visit:
 # https://github.com/alces-flight/flight-docs
 # ==============================================================================
-require 'tty-table'
-require_relative 'patches/tty-table_column_constraint'
-require_relative 'patches/unicode-display_width'
+# Allow ColumnConstraint to be disabled
+class TTY::Table::ColumnConstraint
+  class << self
+    attr_accessor :rotate
+  end
+  self.rotate = false
 
-module Docs
-  class Table
-    DEFAULT_PADDING = [0,1].freeze
+  def enforce
+    assert_minimum_width
+    padding = renderer.padding
 
-    class << self
-      def build(&block)
-        new.build(&block)
-      end
-
-      def emit(renderer: nil, &block)
-        build(&block).emit(renderer: renderer)
-      end
-    end
-
-    def initialize
-      @table = TTY::Table.new(header: [''])
-      @table.header.fields.clear
-      @padding = DEFAULT_PADDING
-    end
-
-    attr_reader :table
-
-    def build(&block)
-      instance_eval(&block)
-      self
-    end
-
-    def emit(renderer: nil)
-      options = {}.tap do |o|
-        o[:padding] = @padding unless @padding.nil?
-        o[:multiline] = true
-      end
-      if renderer.nil?
-        puts @table.render(:unicode, options)
+    if natural_width <= renderer.width
+      if renderer.resize
+        expand_column_widths
       else
-        puts renderer.new(@table, options).render
+        renderer.column_widths.map do |width|
+          padding.left + width + padding.right
+        end
       end
-    end
-
-    def headers(*titles)
-      titles.each_with_index do |v, i|
-        @table.header[i] = v
-      end
-    end
-
-    def padding(*pads)
-      @padding = pads.length == 1 ? pads.first : pads
-    end
-
-    def row(*vals)
-      @table << vals
-    end
-
-    def rows(*vals)
-      vals.each do |r|
-        @table << r
+    else
+      if renderer.resize
+        shrink
+      else
+        if self.class.rotate == true
+          rotate
+        else
+          renderer.column_widths.map do |width|
+            padding.left + width + padding.right
+          end
+        end
       end
     end
   end

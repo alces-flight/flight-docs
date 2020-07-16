@@ -41,6 +41,7 @@ module Docs
         end
 
         pretty_content_type = self.method(:pretty_content_type)
+        word_wrap = method(:word_wrap)
         location_cols, title_cols = truncate_lengths(documents)
 
         table = Table.build do |t|
@@ -50,8 +51,8 @@ module Docs
               # NOTE: If changing this also change `truncate_lengths`.
               row(
                 doc.id,
-                doc.location.truncate(location_cols),
-                doc.filename.truncate(title_cols),
+                word_wrap.call(doc.location, line_width: location_cols),
+                word_wrap.call(doc.filename, line_width: title_cols),
                 pretty_content_type.(doc.content_type)
               )
             else
@@ -222,6 +223,38 @@ module Docs
 
           [ location_cols, title_cols ]
         end
+      end
+
+      def word_wrap(
+        text,
+        line_width: 80,
+        break_sequence: "\n",
+        split_reqexes: ['\s+', '[-_]', '\s+|[-_]' ]
+      )
+        split_reg = split_reqexes[0] || '\s+|[-_]'
+        replacement = split_reg == '\s+' ?
+          "\\1#{break_sequence}" :
+          "\\1#{break_sequence}\\2"
+        text.split("\n").collect! do |line|
+          if line.length > line_width
+            wrapped_line = line.gsub(
+              /(.{1,#{line_width}})(#{split_reg}|$)/,
+                replacement
+            ).strip
+            if wrapped_line.split(break_sequence).any?{|l| l.length > line_width}
+              word_wrap(
+                text,
+                line_width: line_width,
+                break_sequence: break_sequence,
+                split_reqexes: split_reqexes[1..-1],
+              )
+            else
+              wrapped_line
+            end
+          else
+            line
+          end
+        end * break_sequence
       end
     end
   end
