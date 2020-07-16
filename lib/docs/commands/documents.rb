@@ -42,25 +42,24 @@ module Docs
 
         pretty_content_type = self.method(:pretty_content_type)
         word_wrap = method(:word_wrap)
-        location_cols, title_cols = truncate_lengths(documents)
+        location_cols, filename_cols = truncate_lengths(documents)
 
         table = Table.build do |t|
-          headers 'ID', 'Location', 'Title', 'Type'
+          headers 'Filename', 'Location', 'Type'
           documents.each do |doc|
             if $stdout.tty?
               # NOTE: If changing this also change `truncate_lengths`.
               row(
-                Paint[doc.id, :green],
+                Paint[word_wrap.call(doc.filename, line_width: filename_cols), :cyan],
                 Paint[word_wrap.call(doc.location, line_width: location_cols), :yellow],
-                Paint[word_wrap.call(doc.filename, line_width: title_cols), :cyan],
                 pretty_content_type.(doc.content_type)
               )
             else
               row(
-                doc.id,
-                doc.location,
                 doc.filename,
-                pretty_content_type.(doc.content_type)
+                doc.location,
+                pretty_content_type.(doc.content_type),
+                doc.id,
               )
             end
           end
@@ -202,17 +201,15 @@ module Docs
         max_filename_length = documents.map { |d| d.filename.length }.max
 
         # We make a few assumptions here.
-        #  - 3 cols is sufficient to display the id.
         #  - 11 cols is sufficient to display the content type.  The longest
         #    we currently have is `Spreadsheet`.
-        #  - There are 4 columns.
-        id_width = 3
+        #  - There are 3 columns.
         type_width = 11
-        num_cols = 4
+        num_cols = 3
         padding = num_cols * 3 + 1
 
         # The available cols to split between location and filename
-        available_cols = TTY::Screen.width - id_width - type_width - padding
+        available_cols = TTY::Screen.width - type_width - padding
 
         if max_location_length + max_filename_length <= available_cols
           # No truncation necessary.
@@ -221,10 +218,11 @@ module Docs
           # Let's give 30% to location unless it needs less.
           location_cols = [available_cols * 0.3, max_location_length].min.to_i
 
-          # The title gets everything else. Even if it doesn't need this much.
-          title_cols = available_cols - location_cols
+          # The filename gets everything else. Even if it doesn't need this
+          # much.
+          filename_cols = available_cols - location_cols
 
-          [ location_cols, title_cols ]
+          [ location_cols, filename_cols ]
         end
       end
 
