@@ -51,7 +51,7 @@ module Docs
           record.name
         else
           names = containers
-            .map { |c| c.respond_to?(:display_id) ? c.display_id : c.name }
+            .map { |c| c.respond_to?(:display_id) ? "Case #{c.display_id}" : c.name }
           if names.length > 1
             names[1..-1].join(" / ")
           else
