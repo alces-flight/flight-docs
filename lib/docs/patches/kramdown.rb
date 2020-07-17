@@ -59,6 +59,40 @@ module TTY
               end
         opts[:result] << code.join("\n")
       end
+
+      def convert_td(el, opts)
+        indent = ' ' * @current_indent
+        pipe       = TTY::Markdown.symbols[:pipe]
+        styles     = Array(@theme[:table])
+        table_data = opts[:table_data]
+        result     = opts[:cells]
+        suffix     = " #{@pastel.decorate(pipe, *styles)} "
+        opts[:result] = []
+
+        inner(el, opts)
+
+        row, column = *find_row_column(table_data, opts[:result])
+        cell_widths = distribute_widths(max_widths(table_data))
+        cell_width = cell_widths[column]
+        cell_height = max_height(table_data, row, cell_widths)
+        alignment  = opts[:alignment][column]
+        align_opts = alignment == :default ? {} : { direction: alignment }
+
+        wrapped = Strings.wrap(opts[:result].join, cell_width)
+        aligned = Strings.align(wrapped, cell_width, **align_opts)
+        padded = if aligned.lines.size < cell_height
+                   Strings.pad(aligned, [0, 0, cell_height - aligned.lines.size, 0])
+                 else
+                   aligned.dup
+                 end
+
+        result << padded.lines.map do |line|
+          # add pipe to first column
+          (column.zero? ? indent + @pastel.decorate("#{pipe} ", *styles) : '') +
+            (line.end_with?("\n") ? line.insert(-2, suffix) : line << suffix)
+        end
+      end
+
     end
   end
 end
