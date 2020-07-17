@@ -68,9 +68,26 @@ module Docs
       end
 
       def save(doc, output:)
-        filename = output || doc.filename
+        filename = output ? output : get_unique_filename(doc.filename)
         puts("Saving #{printable?(doc) ? '' : 'binary '}file to #{filename.inspect}")
         File.write(filename, doc.content)
+      end
+
+      def get_unique_filename(filename)
+        return filename unless File.exist?(filename)
+
+        candidate = filename
+        i = 1
+        loop do
+          break if i > 99
+          candidate = "#{filename}.#{i}"
+          if File.exists?(candidate)
+            i += 1
+          else
+            break
+          end
+        end
+        candidate
       end
 
       def whirly(status, &block)
