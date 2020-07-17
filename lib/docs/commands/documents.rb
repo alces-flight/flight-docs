@@ -68,9 +68,22 @@ module Docs
       end
 
       def save(doc, output:)
-        filename = output ? output : get_unique_filename(doc.filename)
+        filename =
+          if output
+            output
+          else
+            get_unique_filename(with_extension(doc.filename, doc.content_type))
+          end
         puts("Saving #{printable?(doc) ? '' : 'binary '}file to #{filename.inspect}")
         File.write(filename, doc.content)
+      end
+
+      def with_extension(filename, content_type)
+        if content_type == 'text/markdown' && File.extname(filename).empty?
+          "#{filename}.md"
+        else
+          filename
+        end
       end
 
       def get_unique_filename(filename)
