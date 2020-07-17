@@ -38,20 +38,4 @@ module Docs
   module Commands
     autoload(:Documents, 'docs/commands/documents')
   end
-
-  def self.configure_faraday(faraday)
-    faraday.authorization :Bearer, Config::AccountConfig.new.auth_token
-    faraday.headers[:user_agent] = "Flight-Docs/#{Docs::VERSION}"
-  end
-
-  def self.use_faraday_logger(faraday_or_connection)
-    if ENV.fetch('DEBUG', false)
-      faraday_or_connection.use(Faraday::Response::Logger, nil, {
-        headers: false,
-        bodies: false,
-      }) do |l|
-        l.filter(/(Authorization:)(.*)/, '\1 [REDACTED]')
-      end
-    end
-  end
 end

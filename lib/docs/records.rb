@@ -34,8 +34,8 @@ module Docs
     end
 
     BaseRecord.connection do |connection|
-      Docs.configure_faraday(connection.faraday)
-      Docs.use_faraday_logger(connection)
+      API.configure_faraday(connection.faraday)
+      API.use_faraday_logger(connection)
       connection.faraday.ssl.verify = Config::DocsConfig.new.verify_ssl?
     end
 

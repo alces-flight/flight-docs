@@ -29,6 +29,25 @@ require 'json_api_client'
 
 module Docs
   class API
+
+    def self.configure_faraday(faraday, auth_header: true)
+      if auth_header
+        faraday.authorization :Bearer, Config::AccountConfig.new.auth_token
+      end
+      faraday.headers[:user_agent] = "Flight-Docs/#{Docs::VERSION}"
+    end
+
+    def self.use_faraday_logger(faraday_or_connection)
+      if ENV.fetch('DEBUG', false)
+        faraday_or_connection.use(Faraday::Response::Logger, nil, {
+          headers: true,
+          bodies: false,
+        }) do |l|
+          l.filter(/(Authorization:)(.*)/, '\1 [REDACTED]')
+        end
+      end
+    end
+
     def list
       query = Records::Document
         .includes(:containers, :record)
@@ -107,8 +126,8 @@ module Docs
 
     def http
       @http ||= Faraday.new do |faraday|
-        Docs.configure_faraday(faraday)
-        Docs.use_faraday_logger(faraday)
+        self.class.configure_faraday(faraday, auth_header: false)
+        self.class.use_faraday_logger(faraday)
         faraday.use FaradayMiddleware::FollowRedirects
         faraday.use Faraday::Response::RaiseError
         faraday.adapter Faraday.default_adapter
