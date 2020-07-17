@@ -69,7 +69,7 @@ module Docs
 
       def save(doc, output:)
         filename = output || doc.filename
-        puts("Saving binary file to #{filename.inspect}")
+        puts("Saving #{printable?(doc) ? '' : 'binary '}file to #{filename.inspect}")
         File.write(filename, doc.content)
       end
 
