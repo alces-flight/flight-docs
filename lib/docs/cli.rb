@@ -61,6 +61,7 @@ module Docs
       c.description = 'List all available documents for your Alces Flight Center account.'
       c.action run_docs_method(:list)
     end
+    alias_command :ls, :list
 
     command :show do |c|
       cli_syntax(c, 'DOCUMENT')
@@ -84,5 +85,6 @@ module Docs
       c.slop.string '-o', '--output', 'Save DOCUMENT to FILE.  Defaults to a file named DOCUMENT.', meta: 'FILE'
       c.action run_docs_method(:download)
     end
+    alias_command :get, :download
   end
 end
