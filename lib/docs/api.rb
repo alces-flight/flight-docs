@@ -32,6 +32,7 @@ module Docs
     def list
       query = Records::Document
         .includes(:containers, :record)
+        .select(cases: 'display_id', components: 'name', sites: 'name')
       if block_given?
         query = yield query
       end
