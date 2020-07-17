@@ -35,8 +35,7 @@ module Docs
       if block_given?
         query = yield query
       end
-      query
-        .all
+      funky_coalesce(query.all)
         .sort_by { |d| d.filename.downcase }
     rescue JsonApiClient::Errors::ConnectionError
       raise Errors::ApiUnavailable
@@ -63,6 +62,22 @@ module Docs
     end
 
     private
+
+    def funky_coalesce(docs)
+      by_download_link = docs.reduce({}) do |accum, doc|
+        accum[doc.links.download] ||= []
+        accum[doc.links.download] << doc
+        accum
+      end
+      by_download_link.reduce([]) do |accum, link_and_docs|
+        doc, *others = link_and_docs.second
+        others.each do |d|
+          doc.add_location(d.location)
+        end
+        accum << doc
+        accum
+      end
+    end
 
     # def get_by_id(id)
     #   Records::Document.find(id).first

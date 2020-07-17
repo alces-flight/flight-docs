@@ -46,6 +46,14 @@ module Docs
         @content.to_s
       end
 
+      def add_location(location)
+        _locations << location
+      end
+
+      def locations
+        _locations.join(", ")
+      end
+
       def location
         if containers.empty?
           record.name
@@ -62,6 +70,12 @@ module Docs
 
       def content_type
         self['content-type'] || self['content_type']
+      end
+
+      private
+
+      def _locations
+        @_locations ||= [location]
       end
     end
 

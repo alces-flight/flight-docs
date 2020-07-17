@@ -147,13 +147,13 @@ module Docs
         end
       end
 
-      # Return sensible lengths to which location and filename can be
+      # Return sensible lengths to which locations and filename can be
       # truncated to avoid wrapping.
       #
       # The current algorithm can result in unnecessarily truncated locations.
       def truncate_lengths(documents)
         return [nil, nil] if documents.empty?
-        max_location_length = documents.map { |d| d.location.length }.max
+        max_location_length = documents.map { |d| d.locations.length }.max
         max_filename_length = documents.map { |d| d.filename.length }.max
 
         # We make a few assumptions here.
@@ -164,14 +164,14 @@ module Docs
         num_cols = 3
         padding = num_cols * 3 + 1
 
-        # The available cols to split between location and filename
+        # The available cols to split between locations and filename
         available_cols = TTY::Screen.width - type_width - padding
 
         if max_location_length + max_filename_length <= available_cols
           # No truncation necessary.
           [ max_location_length, max_filename_length ]
         else
-          # Let's give 30% to location unless it needs less.
+          # Let's give 30% to locations unless it needs less.
           location_cols = [available_cols * 0.3, max_location_length].min.to_i
 
           # The filename gets everything else. Even if it doesn't need this
@@ -220,19 +220,19 @@ module Docs
         location_cols, filename_cols = truncate_lengths(documents)
 
         table = Table.build do |t|
-          headers 'Filename', 'Location', 'Type'
+          headers 'Filename', 'Locations', 'Type'
           documents.each do |doc|
             if $stdout.tty?
               # NOTE: If changing this also change `truncate_lengths`.
               row(
                 Paint[word_wrap.call(doc.filename, line_width: filename_cols), :cyan],
-                Paint[word_wrap.call(doc.location, line_width: location_cols), :yellow],
+                Paint[word_wrap.call(doc.locations, line_width: location_cols), :yellow],
                 pretty_content_type.(doc.content_type)
               )
             else
               row(
                 doc.filename,
-                doc.location,
+                doc.locations,
                 pretty_content_type.(doc.content_type),
                 doc.id,
               )
