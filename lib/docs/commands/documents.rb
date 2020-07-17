@@ -287,6 +287,7 @@ module Docs
           if options[:no_pager]
             puts content
           else
+            ENV['LESS'] ||= '-FRX'
             TTY::Pager.new.page(content)
           end
         else
