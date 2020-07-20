@@ -93,6 +93,22 @@ module TTY
         end
       end
 
+      def max_width(table_data, col)
+        table_data.map do |row|
+          Strings.sanitize(row[col].join).lines.map(&:length).max
+        end
+          .compact
+          .max || 0
+      end
+
+      def convert_html_element(el, opts)
+        if el.value == 'br'
+          opts[:result] << "\n"
+        else
+          warning("HTML elements are not supported")
+        end
+      end
+
     end
   end
 end

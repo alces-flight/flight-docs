@@ -136,7 +136,19 @@ module Docs
 
       def pretty_content(doc, pretty:)
         if $stdout.tty? && pretty && doc.content_type == 'text/markdown'
-          TTY::Markdown.parse(doc.content) rescue doc.content
+          colors = 256
+          begin
+            TTY::Markdown.parse(
+              doc.content.force_encoding('UTF-8'),
+              colors: colors
+            )
+          rescue
+            if colors > 16
+              colors = 16
+              retry
+            end
+            doc.content
+          end
         else
           doc.content
         end
