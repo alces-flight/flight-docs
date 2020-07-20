@@ -24,6 +24,9 @@
 # For more information on Flight Docs, please visit:
 # https://github.com/alces-flight/flight-account
 #==============================================================================
+
+require 'hashids'
+
 require_relative 'docs/version'
 
 module Docs
@@ -37,5 +40,19 @@ module Docs
 
   module Commands
     autoload(:Documents, 'docs/commands/documents')
+  end
+
+  def self.encode_id(id)
+    hashid.encode(id, 0)
+  end
+
+  def self.decode_id(id)
+    hashid.decode(id).first
+  rescue Hashids::InputError
+    nil
+  end
+
+  def self.hashid
+    @hashid ||= Hashids.new("flight-docs", 0, "abcdefghijklmnopqrstuvwxyz")
   end
 end

@@ -29,6 +29,7 @@ git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
 
 gem 'commander-openflighthpc', github: 'openflighthpc/commander-openflighthpc'
 
+gem 'hashids'
 gem 'json_api_client'
 gem 'tty-markdown'
 gem 'tty-pager'

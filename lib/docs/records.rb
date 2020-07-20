@@ -42,6 +42,10 @@ module Docs
     class Document < BaseRecord
       attr_accessor :content
 
+      def hashid
+        @hashid ||= Docs.encode_id(id)
+      end
+
       def content
         @content.to_s
       end

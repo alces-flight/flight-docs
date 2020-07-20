@@ -191,13 +191,16 @@ module Docs
         # We make a few assumptions here.
         #  - 11 cols is sufficient to display the content type.  The longest
         #    we currently have is `Spreadsheet`.
-        #  - There are 3 columns.
+        #  - 10 cols is sufficient to display the quick code / hashid.  The
+        #    column header requires 10 cols.
+        #  - There are 4 columns.
         type_width = 11
-        num_cols = 3
+        code_width = 10
+        num_cols = 4
         padding = num_cols * 3 + 1
 
         # The available cols to split between locations and filename
-        available_cols = TTY::Screen.width - type_width - padding
+        available_cols = TTY::Screen.width - code_width - type_width - padding
 
         if max_location_length + max_filename_length <= available_cols
           # No truncation necessary.
@@ -252,18 +255,20 @@ module Docs
         location_cols, filename_cols = truncate_lengths(documents)
 
         table = Table.build do |t|
-          headers 'Filename', 'Locations', 'Type'
+          headers 'Filename', 'Quick code', 'Locations', 'Type'
           documents.each do |doc|
             if $stdout.tty?
               # NOTE: If changing this also change `truncate_lengths`.
               row(
                 Paint[word_wrap.call(doc.filename, line_width: filename_cols), :cyan],
+                doc.hashid,
                 Paint[word_wrap.call(doc.locations, line_width: location_cols), :yellow],
                 pretty_content_type.(doc.content_type)
               )
             else
               row(
                 doc.filename,
+                doc.hashid,
                 doc.locations,
                 pretty_content_type.(doc.content_type),
                 doc.id,

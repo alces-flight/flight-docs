@@ -61,10 +61,10 @@ module Docs
       raise Errors::ApiUnavailable
     end
 
-    def get(id)
+    def get(id_or_name)
       begin
-        # doc = parse(id).is_a?(Integer) ? get_by_id(id) : get_by_filename(id)
-        doc = get_by_filename(id)
+        id = Docs.decode_id(id_or_name)
+        doc = id ? get_by_id(id) : get_by_filename(id_or_name)
       rescue JsonApiClient::Errors::NotFound, JsonApiClient::Errors::AccessDenied
         raise Errors::DocNotFound, id
       else
@@ -99,9 +99,9 @@ module Docs
       end
     end
 
-    # def get_by_id(id)
-    #   Records::Document.find(id).first
-    # end
+    def get_by_id(id)
+      Records::Document.find(id).first
+    end
 
     def get_by_filename(filename)
       docs = list do |query|
@@ -115,14 +115,6 @@ module Docs
         docs.first
       end
     end
-
-    # def parse(id)
-    #   begin
-    #     Integer(id)
-    #   rescue ArgumentError
-    #     id
-    #   end
-    # end
 
     def http
       @http ||= Faraday.new do |faraday|

@@ -26,6 +26,7 @@ GEM
       multipart-post (>= 1.2, < 3)
     faraday_middleware (0.14.0)
       faraday (>= 0.7.4, < 1.0)
+    hashids (1.0.5)
     highline (2.0.3)
     i18n (1.8.3)
       concurrent-ruby (~> 1.0)
@@ -86,6 +87,7 @@ PLATFORMS
 
 DEPENDENCIES
   commander-openflighthpc!
+  hashids
   json_api_client
   tty-markdown
   tty-pager
