@@ -64,11 +64,11 @@ module Docs
     alias_command :ls, :list
 
     command :show do |c|
-      cli_syntax(c, 'DOCUMENT')
+      cli_syntax(c, 'NAME|QUICK_CODE')
       c.summary = 'Display a document.'
-      c.description = 'Display DOCUMENT in your terminal.'
-      c.slop.bool '--no-pager', 'View the document in a pager', default: false
-      c.slop.bool '--no-pretty', 'Display a pretty rendering of the document', default: false
+      c.description = 'Display a document in your terminal.'
+      c.slop.bool '--no-pager', 'Do not use a pager to view the document.', default: false
+      c.slop.bool '--no-pretty', 'Disable pretty rendering of the document.', default: false
       c.action do |args, opts, config|
         id = args.first.strip
         if id.empty?
@@ -79,10 +79,10 @@ module Docs
     end
 
     command :download do |c|
-      cli_syntax(c, 'DOCUMENT')
+      cli_syntax(c, 'NAME|QUICK_CODE')
       c.summary = 'Download a document.'
       c.description = 'Download DOCUMENT.'
-      c.slop.string '-o', '--output', 'Save DOCUMENT to FILE.  Defaults to a file named DOCUMENT.', meta: 'FILE'
+      c.slop.string '-o', '--output', 'Save the document to FILE.  Defaults to the name of the document.', meta: 'FILE'
       c.action run_docs_method(:download)
     end
     alias_command :get, :download

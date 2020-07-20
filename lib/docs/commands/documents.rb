@@ -255,7 +255,7 @@ module Docs
         location_cols, filename_cols = truncate_lengths(documents)
 
         table = Table.build do |t|
-          headers 'Filename', 'Quick code', 'Locations', 'Type'
+          headers 'Name', 'Quick code', 'Locations', 'Type'
           documents.each do |doc|
             if $stdout.tty?
               # NOTE: If changing this also change `truncate_lengths`.
