@@ -105,7 +105,7 @@ module TTY
         if el.value == 'br'
           opts[:result] << "\n"
         else
-          warning("HTML elements are not supported")
+          raise "HTML elements are not supported"
         end
       end
 
