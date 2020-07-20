@@ -74,7 +74,7 @@ module Docs
           else
             get_unique_filename(with_extension(doc.filename, doc.content_type))
           end
-        puts("Saving #{printable?(doc) ? '' : 'binary '}file to #{filename.inspect}")
+        puts("Saving file to #{filename.inspect}")
         File.write(filename, doc.content)
       end
 
@@ -122,16 +122,6 @@ module Docs
 
       def api
         @api ||= Docs::API.new
-      end
-
-      def printable?(doc)
-        return true if !$stdout.tty?
-        case doc.content_type
-        when /^text\//
-          true
-        else
-          false
-        end
       end
 
       def pretty_content(doc, pretty:)
@@ -294,7 +284,15 @@ module Docs
       end
 
       def display_content(doc, options)
-        if printable?(doc)
+        printable =
+          case doc.content_type
+          when /^text\//
+            true
+          else
+            false
+          end
+
+        if printable
           content = pretty_content(doc, pretty: !options[:no_pretty])
           if options[:no_pager]
             puts content
@@ -303,7 +301,8 @@ module Docs
             TTY::Pager.new.page(content)
           end
         else
-          save(doc, output: options[:output])
+          $stderr.puts("Unable to show binary file. " +
+                       "You can #{Paint['download', :white]} it instead.")
         end
       end
     end
