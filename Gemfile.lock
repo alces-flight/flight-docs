@@ -89,7 +89,7 @@ DEPENDENCIES
   commander-openflighthpc!
   hashids
   json_api_client
-  tty-markdown
+  tty-markdown (~> 0.6.0)
   tty-pager
   tty-table
   whirly

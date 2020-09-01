@@ -24,7 +24,6 @@
 # For more information on Flight Docs, please visit:
 # https://github.com/alces-flight/flight-docs
 #==============================================================================
-require 'tty-markdown'
 require_relative '../patches/kramdown'
 require 'tty-pager'
 require 'whirly'

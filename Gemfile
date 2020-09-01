@@ -31,7 +31,8 @@ gem 'commander-openflighthpc', github: 'openflighthpc/commander-openflighthpc'
 
 gem 'hashids'
 gem 'json_api_client'
-gem 'tty-markdown'
+# NOTE: Remember to remove the patch before upgrading to version 0.7.0 of TTY::Markdown
+gem 'tty-markdown', '~> 0.6.0'
 gem 'tty-pager'
 gem 'tty-table'
 gem 'whirly'
