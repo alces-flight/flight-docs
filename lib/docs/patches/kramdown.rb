@@ -139,6 +139,29 @@ module TTYMarkdownParserPatch
       raise "HTML elements are not supported"
     end
   end
+
+  def convert_a(el, opts)
+    if URI.parse(el.attr["href"]).class == URI::MailTo
+      el.attr["href"] = URI.parse(el.attr["href"]).to
+    end
+
+    if el.children.size == 1 && el.children[0].type == :text && el.children[0].value == el.attr["href"]
+
+      if !el.attr["title"].nil? && !el.attr["title"].strip.empty?
+        opts[:result] << "(#{el.attr["title"]}) "
+      end
+      opts[:result] << @pastel.decorate(el.attr["href"], *@theme[:link])
+
+    elsif el.children.size > 0  && (el.children[0].type != :text || !el.children[0].value.strip.empty?)
+      inner(el, opts)
+
+      opts[:result] << " #{TTY::Markdown.symbols[:arrow]} "
+      if el.attr["title"]
+        opts[:result] << "(#{el.attr["title"]}) "
+      end
+      opts[:result] << @pastel.decorate(el.attr["href"], *@theme[:link])
+    end
+  end
 end
 
 TTY::Markdown::Parser.prepend TTYMarkdownParserPatch
